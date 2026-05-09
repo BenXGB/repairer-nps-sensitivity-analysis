@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Customer Analytics Case Study</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Case Study_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Case Study_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Case Study_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Case Study_files/libs/quarto-html/popper.min.js"></script>
+<script src="Case Study_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Case Study_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Case Study_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Case Study_files/libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Case Study_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Case Study_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Case Study_files/libs/bootstrap/bootstrap-efbb37e9afcc02144ebbc7afd12a776f.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><strong>Customer Analytics Case Study</strong></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="author-ben-ingram" class="level5">
+<h5 class="anchored" data-anchor-id="author-ben-ingram">Author: Ben Ingram</h5>
+<p><strong>Business Context:</strong></p>
+<p>A motor insurance business has a series of partner repair shops across the country which repair customers’ vehicle in the event of a claim. There is a <em>likelihood to recommend</em> survey which gets sent to some customers after their vehicle repair has been completed. The survey result gives insight to how well each repair shop handles various aspects of the customer interation (communication, timeliness etc).</p>
+<p><strong>Problem Statement:</strong></p>
+<p>The business wants to improve their overall net promoter score by +10 points over the next six months. There are over 400 repair shops - some shops only repair a handful of vehicles each week and others repair 100+. The Executive Manager wants to improve the overall NPS by targeting low performing repairers but also does not want to waste training resources on low volume shops.</p>
+</section>
+<section id="which-shops-should-we-direct-training-resources-to-for-the-biggest-uplift-in-nps" class="level5">
+<h5 class="anchored" data-anchor-id="which-shops-should-we-direct-training-resources-to-for-the-biggest-uplift-in-nps"><strong>Which shops should we direct training resources to for the biggest uplift in NPS?</strong></h5>
+<p><strong>Database Design</strong></p>
+<p>Each row represents one completed survey for a customer’s repair journey</p>
+<div id="03d023b9" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;ignore&quot;}}">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">+------------+--------------------+---------------+-------------+-------------+----------------+</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> survey_id  <span class="op">|</span> claim_number       <span class="op">|</span> completed_date<span class="op">|</span> repairer    <span class="op">|</span> survey_score<span class="op">|</span> score_category <span class="op">|</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="op">+------------+--------------------+---------------+-------------+-------------+----------------+</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> C001       <span class="op">|</span> CLM1001            <span class="op">|</span> <span class="dv">2026</span><span class="op">-</span><span class="dv">0</span><span class="er">1</span><span class="op">-</span><span class="dv">10</span>    <span class="op">|</span> AutoFix Ltd <span class="op">|</span> <span class="dv">9</span>           <span class="op">|</span> promoter       <span class="op">|</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> C002       <span class="op">|</span> CLM1002            <span class="op">|</span> <span class="dv">2026</span><span class="op">-</span><span class="dv">0</span><span class="er">1</span><span class="op">-</span><span class="dv">11</span>    <span class="op">|</span> RapidRepair <span class="op">|</span> <span class="dv">7</span>           <span class="op">|</span> passive        <span class="op">|</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> C003       <span class="op">|</span> CLM1003            <span class="op">|</span> <span class="dv">2026</span><span class="op">-</span><span class="dv">0</span><span class="er">1</span><span class="op">-</span><span class="dv">12</span>    <span class="op">|</span> AutoFix Ltd <span class="op">|</span> <span class="dv">10</span>          <span class="op">|</span> promoter       <span class="op">|</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> C004       <span class="op">|</span> CLM1004            <span class="op">|</span> <span class="dv">2026</span><span class="op">-</span><span class="dv">0</span><span class="er">1</span><span class="op">-</span><span class="dv">13</span>    <span class="op">|</span> FixIt Garage<span class="op">|</span> <span class="dv">6</span>           <span class="op">|</span> detractor      <span class="op">|</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> C005       <span class="op">|</span> CLM1005            <span class="op">|</span> <span class="dv">2026</span><span class="op">-</span><span class="dv">0</span><span class="er">1</span><span class="op">-</span><span class="dv">14</span>    <span class="op">|</span> RapidRepair <span class="op">|</span> <span class="dv">8</span>           <span class="op">|</span> passive        <span class="op">|</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="op">+------------+--------------------+---------------+-------------+-------------+----------------+</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Approach</strong></p>
+<p>Ranking repairers purely by raw NPS can overemphasise low-volume outliers and lead to poor resource allocation decisions. In practice, a moderately underperforming repairer with high survey volume may have a far greater impact on overall portfolio NPS than a severely underperforming repairer handling only a small number of claims.</p>
+<p>Lets assess the impact of each repairer on overall NPS using a <em>leave one out</em> sensitivity approach. For each repairer, we recalculate NPS excluding all surveys associated with them and compare this to the baseline NPS.</p>
+<p>This produces a marginal impact score:</p>
+<p><span class="math inline">\(Impact(X) = NPS(without X) − NPS(overall)\)</span></p>
+<p>For example, excluding AutoFix Ltd surveys increases overall NPS by +1.5 points, indicating it is a net drag on our average customer experience.</p>
+<p>This allows us to rank repairers by their relative contribution to overall satisfaction and focus training/operational resources where we will see the biggest improvement.</p>
+<p><strong>Example Base Query</strong> - Let’s just calculate NPS per month to establish the general foundation for the rest of the analysis:</p>
+<div id="09b53d6c" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;postgres&quot;}}">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SELECT DATE_TRUNC(<span class="st">'month'</span>, completed_date) AS survey_month</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>        , <span class="dv">100</span> <span class="op">*</span> (SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'promoter'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END) </span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">-</span> SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'detractor'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END))::<span class="bu">float</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">/</span> COUNT(<span class="op">*</span>) AS nps_score <span class="op">--</span> we would wrap this <span class="kw">in</span> a nullif <span class="kw">or</span> similar <span class="kw">in</span> a production query to avoid divide by zero errors</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        , COUNT(<span class="op">*</span>) AS total_surveys</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>FROM surveys</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>WHERE completed_date <span class="op">&gt;=</span> DATE_TRUNC(<span class="st">'month'</span>, CURRENT_DATE) <span class="op">-</span> INTERVAL <span class="st">'3 months'</span> <span class="op">--</span> we<span class="st">'ll take a 3 month window to smooth out volatility</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="er">        AND completed_date &lt; DATE_TRUNC</span>(<span class="st">'month'</span>, CURRENT_DATE) <span class="op">--</span> dont include developing month</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>GROUP BY survey_month</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>ORDER BY survey_month<span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>CTEs</strong> - A few handy blocks we will reference later</p>
+<p>Our baseline NPS over a three month window excluding the developing month</p>
+<div id="2095ea89" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;postgres&quot;}}">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>WITH cte_overall_nps AS (</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    SELECT <span class="dv">100</span> <span class="op">*</span> (SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'promoter'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END) </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">-</span> SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'detractor'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">/</span> COUNT(<span class="op">*</span>) AS overall_nps</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    FROM surveys</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    WHERE completed_date <span class="op">&gt;=</span> DATE_TRUNC(<span class="st">'month'</span>, CURRENT_DATE) <span class="op">-</span> INTERVAL <span class="st">'3 months'</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        AND completed_date <span class="op">&lt;</span> DATE_TRUNC(<span class="st">'month'</span>, CURRENT_DATE)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>A unique list of repairers in our time frame - will make things easier when we calculate NPS ex. repairers</p>
+<div id="ecdee42e" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;postgres&quot;}}">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>, cte_repairer_list AS (</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    SELECT DISTINCT repairer</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    FROM surveys</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    WHERE completed_date <span class="op">&gt;=</span> DATE_TRUNC(<span class="st">'month'</span>, CURRENT_DATE) <span class="op">-</span> INTERVAL <span class="st">'3 months'</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        AND completed_date <span class="op">&lt;</span> DATE_TRUNC(<span class="st">'month'</span>, CURRENT_DATE)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>NPS calculation excluding each repairer from our list</p>
+<div id="19d1c7e2" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;postgres&quot;}}">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>, cte_leave_one_out AS (</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    SELECT r.repairer</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    , COUNT(<span class="op">*</span>) AS remaining_surveys</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    , <span class="dv">100</span> <span class="op">*</span> (SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'promoter'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END) </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">-</span> SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'detractor'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">/</span> COUNT(<span class="op">*</span>) AS nps_without_repairer</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    FROM cte_repairer_list r</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    INNER JOIN surveys s</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        ON r.repairer <span class="op">&lt;&gt;</span> s.repairer <span class="op">--</span> we want to exclude the repairers own surveys to see the impact of their removal on overall NPS</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    WHERE s.completed_date <span class="op">&gt;=</span> DATE_TRUNC(<span class="st">'month'</span>, CURRENT_DATE) <span class="op">-</span> INTERVAL <span class="st">'3 months'</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>        AND s.completed_date <span class="op">&lt;</span> DATE_TRUNC(<span class="st">'month'</span>, CURRENT_DATE)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    GROUP BY r.repairer</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Per repairer NPS and survey count for full information in our final output. We could combine this with the above CTE but will keep separate for code readability.</p>
+<div id="55692438" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;postgres&quot;}}">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>, cte_repairer_metrics AS (</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    SELECT r.repairer</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    , COUNT(<span class="op">*</span>) AS total_surveys</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    , <span class="dv">100</span> <span class="op">*</span> (SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'promoter'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END) </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="op">-</span> SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'detractor'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="op">/</span> COUNT(<span class="op">*</span>) AS repairer_nps</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    FROM cte_repairer_list r</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    INNER JOIN surveys s</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        ON r.repairer <span class="op">=</span> s.repairer</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    WHERE s.completed_date <span class="op">&gt;=</span> DATE_TRUNC(<span class="st">'month'</span>, CURRENT_DATE) <span class="op">-</span> INTERVAL <span class="st">'3 months'</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        AND s.completed_date <span class="op">&lt;</span> DATE_TRUNC(<span class="st">'month'</span>, CURRENT_DATE)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    GROUP BY r.repairer</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Final query</strong> - Bring together the CTEs, calculate the impact, and rank accordingly</p>
+<div id="be42cdc3" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;postgres&quot;}}">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>SELECT l.repairer</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>, o.overall_nps</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>, l.nps_without_repairer</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>, m.repairer_nps</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>, m.total_surveys</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>, ROUND(l.nps_without_repairer <span class="op">-</span> o.overall_nps, <span class="dv">2</span>) AS nps_impact</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>, CASE WHEN l.nps_without_repairer <span class="op">&gt;</span> o.overall_nps THEN <span class="st">'Drag on NPS'</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>       WHEN l.nps_without_repairer <span class="op">&lt;</span> o.overall_nps THEN <span class="st">'Positive Impact'</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>       ELSE <span class="st">'Neutral'</span> END AS impact_category</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>FROM cte_leave_one_out l</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>INNER JOIN cte_repairer_metrics m</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    ON l.repairer <span class="op">=</span> m.repairer</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>CROSS JOIN cte_overall_nps o</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>ORDER BY nps_impact DESC</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>LIMIT <span class="dv">5</span><span class="op">;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Sample Output Below</strong></p>
+<div id="21b4e762" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;ignore&quot;}}">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">+----+----------------------+-------------+---------------+----------------+---------------+------------+------------------+</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>    <span class="op">|</span> repairer             <span class="op">|</span> overall_nps <span class="op">|</span> nps_without_  <span class="op">|</span> repairer_nps   <span class="op">|</span> total_surveys <span class="op">|</span> nps_impact <span class="op">|</span> impact_category  <span class="op">|</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>    <span class="op">|</span>                      <span class="op">|</span>             <span class="op">|</span> repairer      <span class="op">|</span>                <span class="op">|</span>               <span class="op">|</span>            <span class="op">|</span>                  <span class="op">|</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="op">+----+----------------------+-------------+---------------+----------------+---------------+------------+------------------+</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> <span class="dv">1</span>  <span class="op">|</span> AutoFix Ltd          <span class="op">|</span>     <span class="fl">41.6</span>    <span class="op">|</span>     <span class="fl">43.1</span>      <span class="op">|</span>     <span class="fl">18.4</span>       <span class="op">|</span>     <span class="dv">412</span>       <span class="op">|</span>   <span class="fl">1.5</span>      <span class="op">|</span> Drag on NPS      <span class="op">|</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> <span class="dv">2</span>  <span class="op">|</span> Rapid Repair Group   <span class="op">|</span>     <span class="fl">41.6</span>    <span class="op">|</span>     <span class="fl">42.8</span>      <span class="op">|</span>     <span class="fl">22.1</span>       <span class="op">|</span>     <span class="dv">288</span>       <span class="op">|</span>   <span class="fl">1.2</span>      <span class="op">|</span> Drag on NPS      <span class="op">|</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> <span class="dv">3</span>  <span class="op">|</span> City Auto Centre     <span class="op">|</span>     <span class="fl">41.6</span>    <span class="op">|</span>     <span class="fl">44.2</span>      <span class="op">|</span>     <span class="fl">33.5</span>       <span class="op">|</span>     <span class="dv">820</span>       <span class="op">|</span>   <span class="fl">1.1</span>      <span class="op">|</span> Drag on NPS      <span class="op">|</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> <span class="dv">4</span>  <span class="op">|</span> Apex Bodyworks       <span class="op">|</span>     <span class="fl">41.6</span>    <span class="op">|</span>     <span class="fl">42.5</span>      <span class="op">|</span>     <span class="fl">25.3</span>       <span class="op">|</span>     <span class="dv">167</span>       <span class="op">|</span>   <span class="fl">0.9</span>      <span class="op">|</span> Drag on NPS      <span class="op">|</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="op">|</span> <span class="dv">5</span>  <span class="op">|</span> Northside Repairs    <span class="op">|</span>     <span class="fl">41.6</span>    <span class="op">|</span>     <span class="fl">42.3</span>      <span class="op">|</span>     <span class="fl">27.8</span>       <span class="op">|</span>      <span class="dv">94</span>       <span class="op">|</span>   <span class="fl">0.7</span>      <span class="op">|</span> Drag on NPS      <span class="op">|</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="op">+----+----------------------+-------------+---------------+----------------+---------------+------------+------------------+</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><strong>Recommendation and further thoughts</strong></p>
+<p>The business should allocate training resources to the repair shops listed for the largest impact to overall NPS. Note we will naturally hit diminishing returns as we work down the list and review each month.</p>
+<p>Ideas for further analysis:</p>
+<ul>
+<li>Set up a tracking framework to ensure repair shops are improving post corrective action / training implementation</li>
+<li>Build an additional metric tracking how frequently each repairer appears in the top 5 over the past 12 months. This helps distinguish persistent operational issues from short-term volatility driven by temporary factors such as management changes, staffing disruption etc.</li>
+<li>Order by ascending impact score to see if theres anything we can learn from our best performing repair shops</li>
+</ul>
+<p><strong>Considerations</strong></p>
+<ul>
+<li>Results should be interpreted alongside operational context such as claim complexity and region</li>
+<li>A repairer with low NPS impact may still warrant intervention if complaint severity is high</li>
+</ul>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
