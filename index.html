@@ -161,7 +161,7 @@ window.Quarto = {
 <p>This allows us to rank repairers by their relative contribution to overall satisfaction and focus training/operational resources where we will see the biggest improvement.</p>
 <p><strong>Example Base Query</strong> - Let’s just calculate NPS per month to establish the general foundation for the rest of the analysis:</p>
 <div id="09b53d6c" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;postgres&quot;}}">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SELECT DATE_TRUNC(<span class="st">'month'</span>, completed_date) AS survey_month</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>SELECT DATE_TRUNC(<span class="st">'month'</span>, completed_date) AS survey_month</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>        , <span class="dv">100</span> <span class="op">*</span> (SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'promoter'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END) </span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">-</span> SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'detractor'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END))::<span class="bu">float</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">/</span> COUNT(<span class="op">*</span>) AS nps_score <span class="op">--</span> we would wrap this <span class="kw">in</span> a nullif <span class="kw">or</span> similar <span class="kw">in</span> a production query to avoid divide by zero errors</span>
@@ -175,7 +175,7 @@ window.Quarto = {
 <p><strong>CTEs</strong> - A few handy blocks we will reference later</p>
 <p>Our baseline NPS over a three month window excluding the developing month</p>
 <div id="2095ea89" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;postgres&quot;}}">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>WITH cte_overall_nps AS (</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>WITH cte_overall_nps AS (</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    SELECT <span class="dv">100</span> <span class="op">*</span> (SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'promoter'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END) </span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="op">-</span> SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'detractor'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END))</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="op">/</span> COUNT(<span class="op">*</span>) AS overall_nps</span>
@@ -186,7 +186,7 @@ window.Quarto = {
 </div>
 <p>A unique list of repairers in our time frame - will make things easier when we calculate NPS ex. repairers</p>
 <div id="ecdee42e" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;postgres&quot;}}">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>, cte_repairer_list AS (</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>, cte_repairer_list AS (</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    SELECT DISTINCT repairer</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    FROM surveys</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    WHERE completed_date <span class="op">&gt;=</span> DATE_TRUNC(<span class="st">'month'</span>, CURRENT_DATE) <span class="op">-</span> INTERVAL <span class="st">'3 months'</span></span>
@@ -195,7 +195,7 @@ window.Quarto = {
 </div>
 <p>NPS calculation excluding each repairer from our list</p>
 <div id="19d1c7e2" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;postgres&quot;}}">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>, cte_leave_one_out AS (</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>, cte_leave_one_out AS (</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    SELECT r.repairer</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    , COUNT(<span class="op">*</span>) AS remaining_surveys</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    , <span class="dv">100</span> <span class="op">*</span> (SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'promoter'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END) </span>
@@ -211,7 +211,7 @@ window.Quarto = {
 </div>
 <p>Per repairer NPS and survey count for full information in our final output. We could combine this with the above CTE but will keep separate for code readability.</p>
 <div id="55692438" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;postgres&quot;}}">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>, cte_repairer_metrics AS (</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>, cte_repairer_metrics AS (</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    SELECT r.repairer</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    , COUNT(<span class="op">*</span>) AS total_surveys</span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    , <span class="dv">100</span> <span class="op">*</span> (SUM(CASE WHEN score_category <span class="op">=</span> <span class="st">'promoter'</span> THEN <span class="dv">1</span> ELSE <span class="dv">0</span> END) </span>
@@ -227,7 +227,7 @@ window.Quarto = {
 </div>
 <p><strong>Final query</strong> - Bring together the CTEs, calculate the impact, and rank accordingly</p>
 <div id="be42cdc3" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;postgres&quot;}}">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>SELECT l.repairer</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>SELECT l.repairer</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>, o.overall_nps</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>, l.nps_without_repairer</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>, m.repairer_nps</span>
@@ -245,7 +245,7 @@ window.Quarto = {
 </div>
 <p><strong>Sample Output Below</strong></p>
 <div id="21b4e762" class="cell" data-quarto-private-1="{&quot;key&quot;:&quot;vscode&quot;,&quot;value&quot;:{&quot;languageId&quot;:&quot;ignore&quot;}}">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">+----+----------------------+-------------+---------------+----------------+---------------+------------+------------------+</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">+----+----------------------+-------------+---------------+----------------+---------------+------------+------------------+</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>    <span class="op">|</span> repairer             <span class="op">|</span> overall_nps <span class="op">|</span> nps_without_  <span class="op">|</span> repairer_nps   <span class="op">|</span> total_surveys <span class="op">|</span> nps_impact <span class="op">|</span> impact_category  <span class="op">|</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="op">|</span>    <span class="op">|</span>                      <span class="op">|</span>             <span class="op">|</span> repairer      <span class="op">|</span>                <span class="op">|</span>               <span class="op">|</span>            <span class="op">|</span>                  <span class="op">|</span></span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="op">+----+----------------------+-------------+---------------+----------------+---------------+------------+------------------+</span></span>
